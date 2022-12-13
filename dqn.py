@@ -111,12 +111,12 @@ def eval(env, net, i_step):
     num_eval = 10
     eps = 0.0
     for idx in range(num_eval):
-        obs = env.reset()
+        obs, info = env.reset()
         done = False 
         ep_reward = 0.0
         while not done:
             action = select_action(obs, eps, net, env, greedy=True)
-            next_obs, rew, done, info = env.step(action)
+            next_obs, rew, t, done, info = env.step(action)
             ep_reward += rew
             obs = next_obs 
         ep_rewards.append(ep_reward) 
@@ -139,12 +139,12 @@ def train(num_episode=100000):
     eps = eps_start
     i_step = 0
     for i_episode in range(num_episode):
-        obs = env.reset()
+        obs, info = env.reset()
         done = False
         ep_reward = 0.0 
         while not done:
             action = select_action(obs, eps, net, env)
-            next_obs, rew, done, info = env.step(action)
+            next_obs, rew, t, done, info = env.step(action)
             buf.add(obs, action, next_obs, rew, float(not done))
             ep_reward += rew 
             update_parameters(buf.sample(batch_size=100), net, optimizer, loss_func, i_step)
